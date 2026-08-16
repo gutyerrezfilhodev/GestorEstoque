@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerenciador de Estoque — Setor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- Tela Inicial -->
+  <div id="homeView">
+    <div id="initialSetupBlock">
+      <p class="eyebrow">Configuração inicial</p>
+      <h3>Em quantos setores você quer dividir o estoque?</h3>
+      <div class="setup-card">
+        <label for="numSetores">Número de setores</label>
+        <div class="num-control">
+          <button type="button" id="decBtn" aria-label="Diminuir">–</button>
+          <input type="number" id="numSetores" min="1" max="6" value="1" inputmode="numeric">
+          <button type="button" id="incBtn" aria-label="Aumentar">+</button>
+        </div>
+        <button type="button" class="action-btn" id="confirmarBtn">OK</button>
+        <span class="hint">mínimo de 1, máximo de 6 setores</span>
+      </div>
+    </div>
+
+    <div id="postSetupBlock" hidden style="width: 100%;">
+      <div class="post-setup-header">
+        <h3>Setores do Estoque</h3>
+        <div class="header-actions">
+          <button type="button" class="action-btn secondary" id="fundirSetoresBtn">Fundir Setores</button>
+          <button type="button" class="action-btn" id="incluirSetorBtn">+ Incluir setor</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="rows" class="rows" hidden></div>
+    <footer>As alterações ficam salvas nesta sessão.</footer>
+  </div>
+
+  <!-- Tela do Setor -->
+  <div id="setorView" hidden>
+    <button type="button" class="back-btn" id="backBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Voltar para setores
+    </button>
+    <p class="eyebrow">Setor selecionado</p>
+    <h3 id="setorTitle">Nome do setor</h3>
+
+    <!-- Barra Superior com os 4 Botões Lado a Lado -->
+    <div class="top-navbar" id="topNavbar"></div>
+
+    <div class="sector-layout">
+      <!-- Centro: Área de Conteúdo (Cadastro / Conferência / Alerta / etc.) -->
+      <div class="main-content-area">
+        <!-- Conteúdo 1: Cadastro de Produtos -->
+        <div class="container-cadastro" id="secaoCadastro">
+          <div class="cadastro-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <h1>Cadastro de produto</h1>
+          </div>
+
+          <form id="productForm" class="form-cadastro">
+            <div class="row-fields two">
+              <div class="field">
+                <label for="codigo">Código</label>
+                <input id="codigo" type="text" placeholder="Ex: PRD-0001" required>
+              </div>
+              <div class="field">
+                <label for="marca">Marca</label>
+                <input id="marca" type="text" placeholder="Ex: Colgate" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="produto">Produto</label>
+              <input id="produto" type="text" placeholder="Ex: Escova de Dente" required>
+            </div>
+
+            <div class="row-fields three">
+              <div class="field">
+                <label for="lote">Lote</label>
+                <input id="lote" type="text" placeholder="Ex: L2026A" required>
+              </div>
+              <div class="field">
+                <label for="validade">Validade</label>
+                <input id="validade" type="date" required>
+              </div>
+              <div class="field">
+                <label for="unidade">Unidade</label>
+                <select id="unidade" required>
+                  <option value="">Selecione</option>
+                  <option value="UN">UN - Unidade</option>
+                  <option value="CX">CX - Caixa</option>
+                  <option value="KG">KG - Quilograma</option>
+                  <option value="G">G - Grama</option>
+                  <option value="L">L - Litro</option>
+                  <option value="ML">ML - Mililitro</option>
+                  <option value="PCT">PCT - Pacote</option>
+                  <option value="FD">FD - Fardo</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="status-field" id="statusField">
+              <span class="status-label">Produto cadastrado?</span>
+              <div class="status-options">
+                <span class="status-pill idle yes" id="pillYes">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  Sim
+                </span>
+                <span class="status-pill idle no" id="pillNo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+                  Não
+                </span>
+              </div>
+              <span class="status-hint" id="statusHint">Digite o código para verificar automaticamente.</span>
+            </div>
+
+            <div class="extra-fields" id="fieldsYes">
+              <p class="extra-title">Produto já existente</p>
+              <div class="row-fields two">
+                <div class="field">
+                  <label for="entradaQtdSim">Entrada de Quantidade</label>
+                  <input id="entradaQtdSim" type="number" min="0" step="1" placeholder="Ex: 50">
+                </div>
+                <div class="field">
+                  <label for="dentalSim">Dental</label>
+                  <input id="dentalSim" type="text" placeholder="Ex: Categoria/observação">
+                </div>
+              </div>
+            </div>
+
+            <div class="extra-fields" id="fieldsNo">
+              <p class="extra-title">Novo produto</p>
+              <div class="row-fields two">
+                <div class="field">
+                  <label for="consumoMensal">Consumo Mensal Estimado</label>
+                  <input id="consumoMensal" type="number" min="0" step="1" placeholder="Ex: 30">
+                </div>
+                <div class="field">
+                  <label for="dentalNao">Dental</label>
+                  <input id="dentalNao" type="text" placeholder="Ex: Categoria/observação">
+                </div>
+              </div>
+              <div class="row-fields two">
+                <div class="field">
+                  <label for="preco">Preço</label>
+                  <input id="preco" type="number" min="0" step="0.01" placeholder="Ex: 19.90">
+                </div>
+                <div class="field">
+                  <label for="entradaQtdNao">Entrada de Quantidade</label>
+                  <input id="entradaQtdNao" type="number" min="0" step="1" placeholder="Ex: 100">
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary-cad">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 6 9 17l-5-5"/></svg>
+                Cadastrar
+              </button>
+              <button type="button" id="clearBtn" class="btn-secondary-cad">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Limpar
+              </button>
+            </div>
+          </form>
+
+          <div id="feedback" class="feedback"></div>
+
+          <div id="listWrap" class="list-wrap">
+            <p class="label">Produtos cadastrados</p>
+            <div id="list" class="list"></div>
+          </div>
+        </div>
+
+        <!-- Conteúdo: Conferência de Estoque -->
+        <div class="container-cadastro" id="secaoConferencia" hidden>
+          <div class="cadastro-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <h1>Conferência de Estoque</h1>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 0;">Lista consolidada para conferência rápida dos itens deste setor.</p>
+          <div id="conferenciaList" class="list" style="margin-top: 16px;"></div>
+        </div>
+
+        <!-- Conteúdo: Alerta de Vencimento -->
+        <div class="container-cadastro" id="secaoAlerta" hidden>
+          <div class="cadastro-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <h1>Alerta de Vencimento</h1>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 0;">Produtos próximos do vencimento ou vencidos ordenados por data.</p>
+          <div id="alertaList" class="list" style="margin-top: 16px;"></div>
+        </div>
+
+        <!-- Conteúdo: Movimentações -->
+        <div class="container-cadastro" id="secaoMovimentacoes" hidden>
+          <div class="cadastro-header">
+            <h1>Movimentações</h1>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 0;">Histórico de entradas e saídas do setor.</p>
+        </div>
+
+        <!-- Conteúdo: Estoque Geral -->
+        <div class="container-cadastro" id="secaoEstoque" hidden>
+          <div class="cadastro-header">
+            <h1>Estoque</h1>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 0;">Visão geral dos saldos em estoque.</p>
+        </div>
+
+        <!-- Conteúdo: Tabela de Preços -->
+        <div class="container-cadastro" id="secaoTabelaPrecos" hidden>
+          <div class="cadastro-header">
+            <h1>Tabela de Preços</h1>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 0;">Gestão e consulta de preços dos produtos.</p>
+        </div>
+
+        <!-- Conteúdo: Compras -->
+        <div class="container-cadastro" id="secaoCompras" hidden>
+          <div class="cadastro-header">
+            <h1>Compras</h1>
+          </div>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-top: 0;">Painel de reposição e pedidos de compra.</p>
+        </div>
+      </div>
+
+      <!-- Lateral Direita: Conferência e Alerta de Vencimento -->
+      <div class="sidebar-right" id="divisoesGrid"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal de Exclusão -->
+<div id="deleteModal" class="modal-overlay" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <h4 id="modalTitle">Excluir setor?</h4>
+    <p id="modalDesc">Tem certeza de que deseja excluir este setor?</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" id="cancelDeleteBtn">Cancelar</button>
+      <button type="button" class="btn-confirm-delete" id="confirmDeleteBtn">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
