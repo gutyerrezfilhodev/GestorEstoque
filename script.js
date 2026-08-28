@@ -46,6 +46,11 @@ const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
 const TOP_BOTOES = [
   {
+    id: 'cadastro',
+    nome: 'Cadastro',
+    icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>'
+  },
+  {
     id: 'movimentacoes',
     nome: 'Movimentações',
     icon: '<path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/>'
@@ -121,12 +126,13 @@ function openSetor(i) {
   const nomeFinal = state[i].nome || ('Setor ' + (i + 1));
   setorTitle.textContent = nomeFinal;
 
-  // Renderiza barra superior (4 botões)
+  // Renderiza barra superior (agora com o Cadastro incluso)
   topNavbar.innerHTML = '';
   TOP_BOTOES.forEach((b) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'top-nav-btn';
+    if (b.id === 'cadastro') btn.classList.add('active'); // Deixa o Cadastro selecionado por padrão ao entrar
     btn.innerHTML = `
       <div class="top-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${b.icon}</svg></div>
       <p class="top-nav-title">${b.nome}</p>
